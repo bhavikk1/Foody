@@ -26,9 +26,38 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let userPickedimage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
         imageView.image = userPickedimage
+        
+            guard let regImage = CIImage(image: userPickedimage) else{
+                fatalError()
+            }
+            detect(image: regImage)
+            
         }
         
         imagePicker.dismiss(animated: true, completion: nil)
+    }
+    
+    
+    func detect(image: CIImage){
+        
+        guard let model = try? VNCoreMLModel(for: Inceptionv3().model) else{
+            fatalError()
+        }
+        
+        let request = VNCoreMLRequest(model: model) { (request, error) in
+            guard let results = request.results as? [VNClassificationObservation] else{
+                fatalError()
+            }
+            print(results)
+        }
+        
+        let handler = VNImageRequestHandler(ciImage: image)
+        do{
+        try handler.perform([request])
+        }
+        catch{
+            print(error)
+        }
     }
 
     

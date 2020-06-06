@@ -48,7 +48,9 @@ class ViewController: UIViewController, UIImagePickerControllerDelegate, UINavig
             guard let results = request.results as? [VNClassificationObservation] else{
                 fatalError()
             }
-            print(results)
+            if let firstResult = results.first{
+                self.navigationItem.title = " I think this is \(firstResult.identifier)"
+            }
         }
         
         let handler = VNImageRequestHandler(ciImage: image)
